@@ -7,6 +7,11 @@ node('ubuntu-appServer-conTest')
         checkout scm
     }
     
+    stage("Snyk-Test")
+    {
+        echo "Snyk test"
+    }
+
     stage('Build-and-Tag')
     {
         /* This builds the actual image;
