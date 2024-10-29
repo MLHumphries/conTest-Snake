@@ -1,4 +1,4 @@
-node('ubuntu-appServer-conTest')
+node('appserver_softsec')
 {
     def app
     stage('Cloning Git')
@@ -16,7 +16,7 @@ node('ubuntu-appServer-conTest')
     {
         /* This builds the actual image;
             * This is synonymous to docker build on the command line */
-        app = docker.build('mlhumphries/contest-snake')
+        app = docker.build('mlhumphries/softsec-snake')
     }
     
     stage('Post-to-dockerhub')

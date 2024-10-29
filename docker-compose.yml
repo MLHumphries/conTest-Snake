@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   snake:
-    image: 'mlhumphries/contest-snake'
+    image: 'mlhumphries/softsec-snake'
     environment:
       - "PORT:3000"
     ports:
