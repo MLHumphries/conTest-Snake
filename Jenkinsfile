@@ -7,16 +7,16 @@ node('appserver_softsec')
         checkout scm
     }
     
-    stage("Snyk-Test")
-    {
-        echo "Snyk test"
-    }
-
     stage('Build-and-Tag')
     {
         /* This builds the actual image;
             * This is synonymous to docker build on the command line */
         app = docker.build('mlhumphries/softsec-snake')
+    }
+
+    stage("Snyk-Test")
+    {
+        echo "Snyk test"
     }
     
     stage('Post-to-dockerhub')
