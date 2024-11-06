@@ -14,9 +14,13 @@ node('appserver_softsec')
         app = docker.build('mlhumphries/softsec-snake')
     }
 
-    stage("Snyk-Test")
+    stage("Snyk")
     {
-        echo "Snyk test"
+        agent 
+        {
+         label 'appserver_softsec'
+        }
+        snykSecurity(snykInstallation: 'Snyk', snykTokenId: 'snyk_credentials', severity: 'critical')
     }
     
     stage('Post-to-dockerhub')
