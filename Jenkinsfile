@@ -18,7 +18,7 @@ node('appserver_softsec')
     {
         agent 
         {
-         label 'appserver_softsec'
+            label 'appserver_softsec'
         }
         snykSecurity(snykInstallation: 'Snyk', snykTokenId: 'snyk_credentials', severity: 'critical')
     }
