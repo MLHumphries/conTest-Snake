@@ -58,7 +58,7 @@ pipeline
             {
                 script 
                 {
-                    def app = docker.build("amlhumphries/contest-snake")
+                    def app = docker.build("mlhumphries/contest-snake")
                     app.tag("latest")
                 }
             }
