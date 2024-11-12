@@ -1,37 +1,97 @@
-node('ubuntu-appServer-conTest')
+pipeline 
 {
-    def app
-    stage('Cloning Git')
+    agent none
+    stages 
     {
-        /* Let's make sure we have the repository cloned to our workspace */
-        checkout scm
-    }
-    
-    stage("Snyk-Test")
-    {
-        echo "Snyk test"
-    }
-
-    stage('Build-and-Tag')
-    {
-        /* This builds the actual image;
-            * This is synonymous to docker build on the command line */
-        app = docker.build('mlhumphries/contest-snake')
-    }
-    
-    stage('Post-to-dockerhub')
-    {
-        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub_credentials')
+        stage('CLONE GIT REPOSITORY') 
         {
-            app.push('latest')
-        }
-    
-    }
-    
-    stage('Deploy')
-    {
-        sh "docker-compose down"
-        sh "docker-compose up -d"
-    }
+            agent 
+            {
+                label 'ubuntu-appServer-conTest'
+            }
+            steps 
+            {
+                checkout scm
+            }
+        }  
  
+        stage('SCA-SAST-SNYK-TEST') 
+        {
+            agent any
+            steps 
+            {
+                script 
+                {
+                    snykSecurity(snykInstallation: 'Snyk', snykTokenId: 'snyk_credentials', severity: 'critical')
+                }
+            }
+        }
+ 
+        stage('SonarQube Analysis') 
+        {
+            agent 
+            {
+                label 'ubuntu-appServer-conTest'
+            }
+            steps 
+            {
+                script 
+                {
+                    def scannerHome = tool 'SonarQubeScanner'
+                    withSonarQubeEnv('sonarqube') 
+                    {
+                        sh "${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=gameapp \
+                            -Dsonar.sources=."
+                    }
+                }
+            }
+        }
+ 
+        stage('BUILD-AND-TAG') 
+        {
+            agent 
+            {
+                label 'ubuntu-appServer-conTest'
+            }
+            steps 
+            {
+                script 
+                {
+                    def app = docker.build("amlhumphries/contest-snake")
+                    app.tag("latest")
+                }
+            }
+        }
+ 
+        stage('POST-TO-DOCKERHUB') 
+        {    
+            agent 
+            {
+                label 'ubuntu-appServer-conTest'
+            }
+            steps {
+                script 
+                {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub_credentials') {
+                        def app = docker.image("mlhumphries/contest-snake")
+                        app.push("latest")
+                    }
+                }
+            }
+        }
+ 
+        stage('DEPLOYMENT') 
+        {    
+            agent 
+            {
+                label 'ubuntu-appServer-conTest'
+            }
+            steps 
+            {
+                sh "docker-compose down"
+                sh "docker-compose up -d"   
+            }
+        }
+    }
 }
