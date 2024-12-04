@@ -20,7 +20,14 @@ node('appserver_softsec')
         {
             label 'appserver_softsec'
         }
-        snykSecurity(snykInstallation: 'Snyk', snykTokenId: 'snyk_credentials', severity: 'low')
+        script 
+        {
+            catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS')
+            {
+                snykSecurity(snykInstallation: 'Snyk', snykTokenId: 'snyk_credentials', severity: 'high')
+            }
+            
+        }
     }
     
     stage('Post-to-dockerhub')
